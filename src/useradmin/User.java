@@ -1,21 +1,20 @@
 package useradmin;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class User {
+ Scanner in=new Scanner(System.in);
  private int id;
  private String name;
  private String password;
- ArrayList<User>usersList=new ArrayList<>();
- ArrayList<User>users=new ArrayList<>();
- ArrayList<User>deleteUser=new ArrayList<>();
- ArrayList<User>viewUser=new ArrayList<>();
+ int deletUser;
 
- String stringId=String.valueOf("id"); // this method is convert the  integer to String.
-  private final String  stringConstant="user.txt";
+ ArrayList<User>users=new ArrayList<>();
 
   public User(){
 
@@ -24,86 +23,80 @@ public class User {
  public void viewUserList(){
   System.out.println("Her is the user list");
   System.out.println();
-  for (int i=0; i<usersList.size();i++){
-   System.out.println("ID: " + usersList.get(i).id);
-   System.out.println("Name: " + usersList.get(i).name);
-   System.out.println("Password: " + usersList.get(i).password);
+  for (int i=0; i<users.size();i++){
+   System.out.println("ID: " + users.get(i).id);
+   System.out.println("Name: " + users.get(i).name);
+   System.out.println("Password: " + users.get(i).password);
    System.out.println();
-
   }
 
  }
+ public int readInt(){
+   while (true){
+    if(in.hasNextInt()){
+     return in.nextInt();
+    }else{
+     System.out.println("You entered something wrong");
+     in.nextLine();
 
-
-
+    }
+   }
+ }
 
  public void creatNewUser() {
   System.out.println("Hi Welcome to user Admin.");
-  System.out.println("Type your id");
-  Scanner scanner=new Scanner(System.in);
-  int id=scanner.nextInt();
+  System.out.println("Type your id: ");
+  int id=readInt();
   System.out.println("Type your name:");
-  String name=scanner.next();
+  String name=in.next();
   System.out.println("type your password");
-  String password=scanner.next();
+  String password=in.next();
   users.add(new User(id,name,password));
-  usersList.add(new User(id, name, password));
-  deleteUser.add(new User(id,name,password));
+
   for (User u : users){
    System.out.println(u);
   }
    addUsers();
+
  }
  public void deletUser(){
+
    System.out.println();
-   System.out.println("Delte user");
-  System.out.println();
-   for (int i=0; i<deleteUser.size();i++){
-    System.out.println("This user is delete");
-    System.out.println("ID "+usersList.get(i)+id);
-    System.out.println("Name "+usersList.get(i)+name);
-    System.out.println("Password "+usersList.get(i).password);
-   }
+   System.out.println("Choice the user want to delete");
+   int userToDelete = readInt();
+    System.out.println();
+    try {
+     User deletedUser = users.remove(userToDelete);
+     System.out.println("This user is delete");
+     System.out.println("ID "+deletedUser.id);
+     System.out.println("Name "+deletedUser.name);
+     System.out.println("Password "+deletedUser.password);
+
+     addUsers();
+
+    }catch (IndexOutOfBoundsException e){
+     System.out.println("You entered something an invalid  to delet");
+    }
 
  }
- public void saveFile(){
-  System.out.println();
-  System.out.println("this is the users info");
-  System.out.println();
-  for (int i=0; i<viewUser.size();i++){
-   System.out.println("This is the list of the users");
-   System.out.println("ID"+viewUser.get(i)+id);
-   System.out.println("Name:"+viewUser.get(i)+name);
-   System.out.println("Password"+viewUser.get(i)+password);
-  }
- }
- public String readFil(){
-   try {
-    PrintStream printStream=new PrintStream(new PrintStream("word.txt"));
-     for (int i=0; i<usersList.size();i++){
-      System.out.println("Id:"+usersList.get(i)+getId()+"Name:"+usersList.get(i)+getName()+""+
-              "Password:"+usersList.get(i)+getPassword());
-     }
-
-   }catch ( FileNotFoundException e){
-
-   }
-   return " ID "+id+" name"+name+" password"+password;
-
- }
-
 
  public void addUsers(){
-  try {
-   PrintStream ps= new PrintStream(new PrintStream("users.txt"));
-   for (int i=0; i<users.size();i++){
-    ps.println("id: "+users.get(i).getId()+" name: "+users.get(i).getName()+
-            " password: "+users.get(i).password);
+   // reset users file
+   try {
+    File file = new File("users.txt");
+    file.delete();
+    file.createNewFile();
+   } catch (IOException e) {
+   }
+
+  try (PrintStream ps= new PrintStream("users.txt")) {
+   for (User user : users) {
+    ps.println("id: " + user.getId() + " name: " + user.getName() +
+            " password: " + user.password);
    }
   }catch (FileNotFoundException e) {
 
   }
-  //return id+" "+name+" "+password;
  }
 
 
@@ -145,6 +138,6 @@ public class User {
    // to string.
    @Override
    public String toString(){
-   return "ID:"+ id+" "+"Name:\n"+getName()+" Password:\n "+getPassword();
+   return"Info:--------------" +"\nID:"+ id+"\n"+"Name:"+getName()+"\nPassword: "+getPassword();
    }
  }
